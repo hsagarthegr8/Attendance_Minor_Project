@@ -8,6 +8,7 @@ Created on Mon Feb 27 20:03:32 2017
 import os
 
 def ensure_dir(directory):
+    '''This function will create the directory only if it is not already present.'''
     if not os.path.exists(directory):
         os.makedirs(directory)
         
@@ -15,6 +16,8 @@ import numpy as np
 from PIL import Image
 
 def get_faces_with_username(root_path):
+    '''This function takes input of a root_path and returns numpy array of usernames
+    corresponding to their faces.'''
     usernames = os.listdir(root_path)
     faces = []
     users = []
