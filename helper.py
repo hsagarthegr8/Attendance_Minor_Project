@@ -20,7 +20,7 @@ def get_faces_with_username(root_path):
     corresponding to their faces.'''
     usernames = os.listdir(root_path)
     faces = []
-    users = []
+    userIDs = []
     for username in usernames:
         path_to_faces = os.path.join(root_path,username)
         faces_path = [os.path.join(path_to_faces,img) for img in os.listdir(path_to_faces)]
@@ -28,5 +28,5 @@ def get_faces_with_username(root_path):
             face_img = Image.open(face)
             face_np = np.array(face_img, 'uint8')
             faces.append(face_np)
-            users.append(username)
-    return np.array(users), faces
+            userIDs.append(int(username))
+    return np.array(userIDs), faces
