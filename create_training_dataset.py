@@ -10,11 +10,13 @@ import cv2, helper
 faceDetect = cv2.CascadeClassifier('Cascade/haarcascade_frontalface_default.xml')
 cam = cv2.VideoCapture(0)
 
-teacher_id = input('Enter teacher_id: ')
-first_name = input('Enter first_name: ')
-last_name = input('Enter last_name: ')
-gender = input('Enter gender (M/F): ')
-joining_date = input('Enter joining_date (yyyy-mm-dd): ')
+teacher_id = raw_input('Enter teacher_id: ')
+first_name = raw_input('Enter first_name: ')
+last_name = raw_input('Enter last_name: ')
+gender = raw_input('Enter gender (M/F): ')
+joining_date = raw_input('Enter joining_date (yyyy-mm-dd): ')
+department = raw_input('Enter department: ')
+designation = raw_input('Enter designation: ')
 
 sample_count = 0
 
@@ -36,10 +38,10 @@ while True:
     cv2.waitKey(1)
     if sample_count >= 20:
         break
-cnx = db.connect()
-db.set_database(cnx)
-db.add_teacher(cnx,teacher_id,first_name,last_name,gender,joining_date)
-cnx.close()
 cam.release()
 cv2.destroyAllWindows()
+cnx = db.connect()
+db.set_database(cnx)
+db.add_teacher(cnx,teacher_id,first_name,last_name,gender,joining_date,department,designation)
+cnx.close()
 
