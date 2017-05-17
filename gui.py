@@ -32,30 +32,38 @@ class Ui_General(object):
         self.cancelButton.setText(_translate("MainWindow", "Cancel"))
 
 class Ui_Privileged(object):
-    def add(self):
+    def addTeacher(self):
         self.addWindow = QtWidgets.QMainWindow()
         self.ui = Ui_AddTeacher()
         self.ui.setupUi(self.addWindow)
         self.addWindow.show()
-        
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(350, 195)
+        MainWindow.resize(397, 284)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.addButton = QtWidgets.QPushButton(self.centralwidget)
-        self.addButton.setGeometry(QtCore.QRect(30, 40, 111, 31))
+        self.addButton.setGeometry(QtCore.QRect(30, 30, 111, 31))
         self.addButton.setObjectName("addButton")
         self.queryButton = QtWidgets.QPushButton(self.centralwidget)
-        self.queryButton.setGeometry(QtCore.QRect(30, 80, 111, 31))
+        self.queryButton.setGeometry(QtCore.QRect(30, 190, 111, 31))
         self.queryButton.setObjectName("queryButton")
         self.cancelButton = QtWidgets.QPushButton(self.centralwidget)
-        self.cancelButton.setGeometry(QtCore.QRect(240, 140, 81, 31))
+        self.cancelButton.setGeometry(QtCore.QRect(280, 230, 81, 31))
         self.cancelButton.setObjectName("cancelButton")
+        self.clickBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.clickBtn.setGeometry(QtCore.QRect(30, 70, 111, 31))
+        self.clickBtn.setObjectName("clickBtn")
+        self.trainBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.trainBtn.setGeometry(QtCore.QRect(30, 110, 111, 31))
+        self.trainBtn.setObjectName("trainBtn")
+        self.testBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.testBtn.setGeometry(QtCore.QRect(30, 150, 111, 31))
+        self.testBtn.setObjectName("testBtn")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.addButton.clicked.connect(self.add)
+        self.addButton.clicked.connect(self.addTeacher)
         self.cancelButton.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -65,77 +73,118 @@ class Ui_Privileged(object):
         self.addButton.setText(_translate("MainWindow", "Add New Teacher"))
         self.queryButton.setText(_translate("MainWindow", "Query"))
         self.cancelButton.setText(_translate("MainWindow", "Cancel"))
+        self.clickBtn.setText(_translate("MainWindow", "Click Pictures"))
+        self.trainBtn.setText(_translate("MainWindow", "Train"))
+        self.testBtn.setText(_translate("MainWindow", "Test"))
 
 class Ui_Login(object):
 
     ###### Method to handle login Button #####
     def accept(self):
-        if self.pass_lineEdit.text() == 'mytechworld':
-            if self.gen_radioButton.isChecked():
-                self.generalWindow = QtWidgets.QMainWindow()
-                self.ui = Ui_General()
-                self.ui.setupUi(self.generalWindow)
-                self.generalWindow.show()
-            if self.pri_radioButton.isChecked():
-                self.privilegedwindow = QtWidgets.QMainWindow()
-                self.ui = Ui_Privileged()
-                self.ui.setupUi(self.privilegedwindow)
-                self.privilegedwindow.show()
+        if self.gen_radioButton.isChecked():
+            self.generalWindow = QtWidgets.QMainWindow()
+            self.ui = Ui_General()
+            self.ui.setupUi(self.generalWindow)
+            self.generalWindow.show()
+        if self.pri_radioButton.isChecked():
+            self.priv = QtWidgets.QMainWindow()
+            self.ui = Ui_PrePrev()
+            self.ui.setupUi(self.priv)
+            self.priv.show()
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(361, 202)
+        Dialog.resize(337, 157)
         self.loginButton = QtWidgets.QPushButton(Dialog)
-        self.loginButton.setGeometry(QtCore.QRect(140, 140, 75, 23))
+        self.loginButton.setGeometry(QtCore.QRect(130, 100, 75, 23))
         self.loginButton.setObjectName("loginButton")
         self.cancelButton = QtWidgets.QPushButton(Dialog)
-        self.cancelButton.setGeometry(QtCore.QRect(230, 140, 75, 23))
+        self.cancelButton.setGeometry(QtCore.QRect(220, 100, 75, 23))
         self.cancelButton.setObjectName("cancelButton")
         self.gen_radioButton = QtWidgets.QRadioButton(Dialog)
-        self.gen_radioButton.setGeometry(QtCore.QRect(140, 80, 101, 16))
+        self.gen_radioButton.setGeometry(QtCore.QRect(140, 40, 101, 16))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.gen_radioButton.setFont(font)
         self.gen_radioButton.setObjectName("gen_radioButton")
         self.pri_radioButton = QtWidgets.QRadioButton(Dialog)
-        self.pri_radioButton.setGeometry(QtCore.QRect(140, 100, 111, 17))
+        self.pri_radioButton.setGeometry(QtCore.QRect(140, 60, 111, 17))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.pri_radioButton.setFont(font)
         self.pri_radioButton.setObjectName("pri_radioButton")
-        self.pass_lineEdit = QtWidgets.QLineEdit(Dialog)
-        self.pass_lineEdit.setGeometry(QtCore.QRect(140, 40, 151, 20))
-        self.pass_lineEdit.setText("")
-        self.pass_lineEdit.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.pass_lineEdit.setClearButtonEnabled(True)
-        self.pass_lineEdit.setObjectName("pass_lineEdit")
         self.label = QtWidgets.QLabel(Dialog)
-        self.label.setGeometry(QtCore.QRect(30, 40, 111, 21))
+        self.label.setGeometry(QtCore.QRect(50, 40, 81, 16))
         font = QtGui.QFont()
-        font.setPointSize(10)
+        font.setPointSize(9)
         self.label.setFont(font)
         self.label.setObjectName("label")
 
         self.retranslateUi(Dialog)
-
-        ###################LoginButton###################
+        ### Accept Button ###
         self.loginButton.clicked.connect(self.accept)
-        if self.pass_lineEdit.text() == 'mytechworld':
-            self.loginButton.clicked.connect(Dialog.close)
-
         self.cancelButton.clicked.connect(Dialog.reject)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Login"))
+        Dialog.setWindowTitle(_translate("Dialog", "Faculty Attendance using Facial Recognition"))
         self.loginButton.setText(_translate("Dialog", "Login"))
         self.cancelButton.setText(_translate("Dialog", "Cancel"))
         self.gen_radioButton.setText(_translate("Dialog", "General Mode"))
         self.pri_radioButton.setText(_translate("Dialog", "Privileged Mode"))
-        self.pass_lineEdit.setPlaceholderText(_translate("Dialog", "Password"))
-        self.label.setText(_translate("Dialog", "Enter Password:"))
+        self.label.setText(_translate("Dialog", "Select Mode:"))
+
+class Ui_PrePrev(object):
+    def OK(self):
+        if self.passField.text() == 'mytechworld':
+            self.privilegedWindow = QtWidgets.QMainWindow()
+            self.ui = Ui_Privileged()
+            self.ui.setupUi(self.privilegedWindow)
+            self.privilegedWindow.show()
+        else:
+            pass
+
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(331, 144)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(30, 40, 91, 16))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.passField = QtWidgets.QLineEdit(self.centralwidget)
+        self.passField.setGeometry(QtCore.QRect(140, 40, 161, 20))
+        self.passField.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.passField.setClearButtonEnabled(True)
+        self.passField.setObjectName("passField")
+        self.okBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.okBtn.setGeometry(QtCore.QRect(140, 90, 75, 23))
+        self.okBtn.setObjectName("okBtn")
+        self.cancelBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.cancelBtn.setGeometry(QtCore.QRect(230, 90, 75, 23))
+        self.cancelBtn.setObjectName("cancelBtn")
+        MainWindow.setCentralWidget(self.centralwidget)
+
+        self.retranslateUi(MainWindow)
         
+        ### Ok Button ###
+        self.okBtn.clicked.connect(self.OK)
+        self.cancelBtn.clicked.connect(MainWindow.close)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Previleged Mode"))
+        self.label.setText(_translate("MainWindow", "Enter Password:"))
+        self.passField.setPlaceholderText(_translate("MainWindow", "Password"))
+        self.okBtn.setText(_translate("MainWindow", "OK"))
+        self.cancelBtn.setText(_translate("MainWindow", "Cancel"))
+
+
 class Ui_AddTeacher(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
