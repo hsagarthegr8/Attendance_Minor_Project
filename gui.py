@@ -32,11 +32,19 @@ class Ui_General(object):
         self.cancelButton.setText(_translate("MainWindow", "Cancel"))
 
 class Ui_Privileged(object):
+    
     def addTeacher(self):
         self.addWindow = QtWidgets.QMainWindow()
         self.ui = Ui_AddTeacher()
         self.ui.setupUi(self.addWindow)
         self.addWindow.show()
+
+    def clickPictures(self):
+        self.clickWindow = QtWidgets.QMainWindow()
+        self.ui = Ui_clickpic()
+        self.ui.setupUi(self.clickWindow)
+        self.clickWindow.show()
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(397, 284)
@@ -64,6 +72,7 @@ class Ui_Privileged(object):
 
         self.retranslateUi(MainWindow)
         self.addButton.clicked.connect(self.addTeacher)
+        self.clickBtn.clicked.connect(self.clickPictures)
         self.cancelButton.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -212,6 +221,7 @@ class Ui_AddTeacher(object):
         self.titleDrop.addItem("")
         self.titleDrop.addItem("")
         self.titleDrop.addItem("")
+        self.titleDrop.addItem("")
         self.firstName = QtWidgets.QLineEdit(self.centralwidget)
         self.firstName.setGeometry(QtCore.QRect(90, 90, 131, 20))
         self.firstName.setText("")
@@ -261,9 +271,10 @@ class Ui_AddTeacher(object):
         self.label_3.setText(_translate("MainWindow", "Last Name:"))
         self.label_4.setText(_translate("MainWindow", "Designation:"))
         self.label_5.setText(_translate("MainWindow", "Gender:"))
-        self.titleDrop.setItemText(0, _translate("MainWindow", "Mr."))
-        self.titleDrop.setItemText(1, _translate("MainWindow", "Mrs."))
-        self.titleDrop.setItemText(2, _translate("MainWindow", "Ms."))
+        self.titleDrop.setItemText(0, _translate("MainWindow", "Dr."))
+        self.titleDrop.setItemText(1, _translate("MainWindow", "Mr."))
+        self.titleDrop.setItemText(2, _translate("MainWindow", "Mrs."))
+        self.titleDrop.setItemText(3, _translate("MainWindow", "Ms."))
         self.firstName.setPlaceholderText(_translate("MainWindow", "First Name"))
         self.lastName.setPlaceholderText(_translate("MainWindow", "Last Name"))
         self.designationDrop.setItemText(0, _translate("MainWindow", "Asst. Professor"))
@@ -276,3 +287,35 @@ class Ui_AddTeacher(object):
         self.addBtn.setText(_translate("MainWindow", "Add"))
         self.label_6.setText(_translate("MainWindow", "Teacher Id:"))
         self.label_7.setText(_translate("MainWindow", "Number"))
+
+
+class Ui_clickpic(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(271, 136)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(30, 40, 61, 16))
+        self.label.setObjectName("label")
+        self.okBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.okBtn.setGeometry(QtCore.QRect(90, 90, 75, 23))
+        self.okBtn.setObjectName("okBtn")
+        self.cancelBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.cancelBtn.setGeometry(QtCore.QRect(180, 90, 75, 23))
+        self.cancelBtn.setObjectName("cancelBtn")
+        self.idEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.idEdit.setGeometry(QtCore.QRect(100, 40, 41, 20))
+        self.idEdit.setObjectName("idEdit")
+        MainWindow.setCentralWidget(self.centralwidget)
+
+        self.retranslateUi(MainWindow)
+        self.cancelBtn.clicked.connect(MainWindow.close)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Click Pictures"))
+        self.label.setText(_translate("MainWindow", "Teacher Id:"))
+        self.okBtn.setText(_translate("MainWindow", "OK"))
+        self.cancelBtn.setText(_translate("MainWindow", "Cancel"))
