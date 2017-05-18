@@ -56,12 +56,11 @@ def create_table(cnx):
     teachers_table = (
         "CREATE TABLE `teachers` ("
         "`teacher_id` varchar(12) NOT NULL ,"
+        "`title` enum('Dr.','Mr.','Mrs.','Ms.') NOT NULL,"
         "`first_name` varchar(14) NOT NULL,"
         "`last_name` varchar(16) NOT NULL,"
         "`gender` enum('M','F') NOT NULL,"
-        "`joining_date` date NOT NULL,"
-        "`department` varchar(3) NOT NULL,"
-        "`designation` varchar(12) NOT NULL,"
+        "`designation` enum('Asst. Professor','Professor','Acct. Professor') NOT NULL,"
         " PRIMARY KEY (`teacher_id`)"
         ") ENGINE=InnoDB")
 
