@@ -28,5 +28,5 @@ def get_faces_with_username(root_path):
             face_img = Image.open(face)
             face_np = np.array(face_img, 'uint8')
             faces.append(face_np)
-            userIDs.append(int(username))
+            userIDs.append(int(username[-2:]))
     return np.array(userIDs), faces

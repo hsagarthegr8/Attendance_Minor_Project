@@ -1,7 +1,14 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import facerec,os,helper
+import databasehelper as db
+import mysql.connector
+from mysql.connector import errorcode
 
 class Ui_General(object):
+    def mark(self):
+        facerec.recognize(True)
+        
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(351, 194)
@@ -22,6 +29,7 @@ class Ui_General(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
+        self.markButton.clicked.connect(self.mark)
         self.cancelButton.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -44,6 +52,14 @@ class Ui_Privileged(object):
         self.ui = Ui_clickpic()
         self.ui.setupUi(self.clickWindow)
         self.clickWindow.show()
+        self.trainBtn.setEnabled(True)
+    
+    def test(self):
+        facerec.recognize()
+
+    def train(self):
+        facerec.train()
+        self.trainBtn.setEnabled(False)
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -72,6 +88,8 @@ class Ui_Privileged(object):
 
         self.retranslateUi(MainWindow)
         self.addButton.clicked.connect(self.addTeacher)
+        self.testBtn.clicked.connect(self.test)
+        self.trainBtn.clicked.connect(self.train)
         self.clickBtn.clicked.connect(self.clickPictures)
         self.cancelButton.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -90,6 +108,7 @@ class Ui_Login(object):
 
     ###### Method to handle login Button #####
     def accept(self):
+        db.set_database()
         if self.gen_radioButton.isChecked():
             self.generalWindow = QtWidgets.QMainWindow()
             self.ui = Ui_General()
@@ -195,6 +214,28 @@ class Ui_PrePrev(object):
 
 
 class Ui_AddTeacher(object):
+    def add(self):
+        id = self.label_7.text()
+        fname = self.firstName.text()
+        lname = self.lastName.text()
+        title = self.titleDrop.currentText()
+        design = self.designationDrop.currentText()
+        gender = None
+        if self.fGender.isChecked():
+            gender = 'F'
+        elif self.mGender.isChecked():
+            gender = 'M'
+        db.add_teacher(id,title,fname,lname,gender,design)
+        helper.ensure_dir('Training/'+id+'/')
+
+
+    def reset(self):
+        self.firstName.clear()
+        self.lastName.clear()
+        self.mGender.setChecked(True)
+        self.titleDrop.setCurrentIndex(0)
+        self.designationDrop.setCurrentIndex(0)
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(474, 229)
@@ -255,11 +296,13 @@ class Ui_AddTeacher(object):
         self.label_6.setGeometry(QtCore.QRect(20, 20, 61, 16))
         self.label_6.setObjectName("label_6")
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
-        self.label_7.setGeometry(QtCore.QRect(90, 20, 61, 16))
+        self.label_7.setGeometry(QtCore.QRect(90, 20, 80, 16))
         self.label_7.setObjectName("label_7")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
+        self.addBtn.clicked.connect(self.add)
+        self.resetBtn.clicked.connect(self.reset)
         self.cancelBtn.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -286,30 +329,89 @@ class Ui_AddTeacher(object):
         self.cancelBtn.setText(_translate("MainWindow", "Cancel"))
         self.addBtn.setText(_translate("MainWindow", "Add"))
         self.label_6.setText(_translate("MainWindow", "Teacher Id:"))
-        self.label_7.setText(_translate("MainWindow", "Number"))
+        helper.ensure_dir('Training/')
+        s = os.listdir('Training')
+        if len(s)<9:
+            id = 'RJITCSEIT0'+str(len(s)+1)
+        else:
+            id = 'RJITCSEIT'+str(len(s)+1)
+        self.label_7.setText(_translate("MainWindow", id ))
 
 
 class Ui_clickpic(object):
+    def go(self):
+        id = self.idBox.currentText()
+        cnx = db.connect()
+        cnx.database = 'RJIT'
+        cursor = cnx.cursor()
+        try:
+            cursor.execute("SELECT `first_name`, `last_name`, `title` FROM `teachers` \
+                       WHERE `teacher_id` = '{}'".format(id))
+            s = cursor.fetchall()
+            self.fName.setText(s[0][0])
+            self.lName.setText(s[0][1])
+            self.title.setText(s[0][2])
+            self.okBtn.setEnabled(True)
+        except mysql.connector.Error as err:
+            print err.msg
+
+    def click(self):
+        id = self.idBox.currentText()
+        facerec.create_dataset(id)
+        
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(271, 136)
+        MainWindow.resize(400, 216)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(30, 40, 61, 16))
         self.label.setObjectName("label")
         self.okBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.okBtn.setGeometry(QtCore.QRect(90, 90, 75, 23))
+        self.okBtn.setGeometry(QtCore.QRect(230, 180, 75, 23))
         self.okBtn.setObjectName("okBtn")
+        self.okBtn.setEnabled(False)
         self.cancelBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.cancelBtn.setGeometry(QtCore.QRect(180, 90, 75, 23))
+        self.cancelBtn.setGeometry(QtCore.QRect(320, 180, 75, 23))
         self.cancelBtn.setObjectName("cancelBtn")
-        self.idEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.idEdit.setGeometry(QtCore.QRect(100, 40, 41, 20))
-        self.idEdit.setObjectName("idEdit")
+        self.idBox = QtWidgets.QComboBox(self.centralwidget)
+        self.idBox.setGeometry(QtCore.QRect(100, 40, 121, 22))
+        self.idBox.setObjectName("idBox")
+        for i in range(len(os.listdir('Training'))):
+            self.idBox.addItem("")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setEnabled(False)
+        self.label_2.setGeometry(QtCore.QRect(30, 120, 61, 16))
+        self.label_2.setObjectName("label_2")
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setEnabled(False)
+        self.label_3.setGeometry(QtCore.QRect(30, 150, 61, 16))
+        self.label_3.setObjectName("label_3")
+        self.goBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.goBtn.setGeometry(QtCore.QRect(240, 40, 51, 23))
+        self.goBtn.setObjectName("goBtn")
+        self.fName = QtWidgets.QLineEdit(self.centralwidget)
+        self.fName.setEnabled(False)
+        self.fName.setGeometry(QtCore.QRect(100, 120, 131, 20))
+        self.fName.setObjectName("fName")
+        self.lName = QtWidgets.QLineEdit(self.centralwidget)
+        self.lName.setEnabled(False)
+        self.lName.setGeometry(QtCore.QRect(100, 150, 131, 20))
+        self.lName.setObjectName("lName")
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setEnabled(False)
+        self.label_4.setGeometry(QtCore.QRect(30, 90, 47, 13))
+        self.label_4.setObjectName("label_4")
+        self.title = QtWidgets.QLineEdit(self.centralwidget)
+        self.title.setEnabled(False)
+        self.title.setGeometry(QtCore.QRect(100, 90, 51, 20))
+        self.title.setObjectName("title")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
+        self.goBtn.clicked.connect(self.go)
+        self.okBtn.clicked.connect(self.click)
         self.cancelBtn.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -319,3 +421,12 @@ class Ui_clickpic(object):
         self.label.setText(_translate("MainWindow", "Teacher Id:"))
         self.okBtn.setText(_translate("MainWindow", "OK"))
         self.cancelBtn.setText(_translate("MainWindow", "Cancel"))
+        self.label_2.setText(_translate("MainWindow", "First Name:"))
+        self.label_3.setText(_translate("MainWindow", "Last Name:"))
+        self.goBtn.setText(_translate("MainWindow", "Go"))
+        self.label_4.setText(_translate("MainWindow", "Title:"))
+        i = 0
+        print(os.listdir('Training'))
+        for id in os.listdir('Training'):
+            self.idBox.setItemText(i, _translate("MainWindow", id))
+            i += 1

@@ -34,8 +34,9 @@ def create_database(cursor,db):
         print "Failed creating database: {}".format(err)
 
 
-def set_database(cnx,db='RJIT'):
+def set_database(db='RJIT'):
     '''This function sets the working database to the cnx object.'''
+    cnx = connect()
     try:
         cnx.database = db
         print "Current Database is set to '{}'".format(db)
@@ -47,9 +48,11 @@ def set_database(cnx,db='RJIT'):
             cnx.database = db
             print "Current Database is set to '{}'".format(db)
             cursor.close()
+            create_table(cnx)
         else:
             print(err)
             exit(1)
+        cnx.close()
 
 
 def create_table(cnx):
@@ -90,13 +93,14 @@ def create_table(cnx):
             print "OK"
     cursor.close()
 
-def add_teacher(cnx,teacher_id,first_name,last_name,gender,joining_date,department,designation):
+def add_teacher(teacher_id,title,first_name,last_name,gender,designation,db='RJIT'):
+    cnx = connect()
+    cnx.database = db
     cursor = cnx.cursor()
     add_teacher = ("INSERT INTO `teachers` "
-                   "(teacher_id, first_name, last_name, gender, joining_date,\
-                       department,designation) "
-                   "VALUES (%s, %s, %s, %s, %s, %s, %s)")
-    data_teacher = (teacher_id,first_name,last_name,gender,joining_date,department,designation)
+                   "(teacher_id, title, first_name, last_name, gender ,designation)"
+                   "VALUES (%s, %s, %s, %s, %s, %s)")
+    data_teacher = (teacher_id,title,first_name,last_name,gender,designation)
     try:
         cursor.execute(add_teacher, data_teacher)
         cnx.commit()
@@ -104,35 +108,43 @@ def add_teacher(cnx,teacher_id,first_name,last_name,gender,joining_date,departme
     except mysql.connector.Error as err:
         print err.msg
     cursor.close()
+    cnx.close()
     
 
-def mark_attendance(cnx,teacher_id):
+def mark_attendance(cnx,tid):
+    x = int(tid)
+    if x < 10:
+        tid = '0'+str(x)
+    teacher_id = 'RJITCSEIT'+tid
     cursor = cnx.cursor()
     name = None
     try:
         cursor.execute("SELECT `first_name`, `last_name` FROM `teachers` \
-                       WHERE `teacher_id` = {}".format(teacher_id))
+                       WHERE `teacher_id` = '{}'".format(teacher_id))
         s = cursor.fetchall()
         name = s[0][0] +' '+s[0][1]
     except mysql.connector.Error as err:
-        print err.ms
+        print err.msg
             
     present = True
     try:
-        cursor.execute("SELECT * FROM `attendance` WHERE `teacher_id` = {} \
+        cursor.execute("SELECT * FROM `attendance` WHERE `teacher_id` = '{}' \
                        and `current_date` = CURRENT_DATE()".format(teacher_id))
         if not cursor.fetchall():
             present = False
     except mysql.connector.Error as err:
         print err.msg
+    print present
     if not present:
         mark_attendance = ("INSERT INTO `attendance` "
                        "(`teacher_id`, `current_date`, `login_time`) \
-                       VALUES ({}, CURRENT_DATE(), CURRENT_TIME())".format(teacher_id))
+                       VALUES ('{}', CURRENT_DATE(), CURRENT_TIME())".format(teacher_id))
+        print 'Hello'
     else:
         mark_attendance = ("UPDATE `attendance` SET `logout_time` = CURRENT_TIME() \
-                           WHERE `attendance`.`teacher_id` = {} AND \
-                           `attendance`.`current_date` = '2017-03-15'".format(teacher_id))
+                           WHERE `attendance`.`teacher_id` = '{}' AND \
+                           `attendance`.`current_date` = CURRENT_DATE()".format(teacher_id))
+        print 'HIiii'
     try:
         cursor.execute(mark_attendance)
         cnx.commit()
