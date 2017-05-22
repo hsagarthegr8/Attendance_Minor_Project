@@ -1,17 +1,27 @@
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtPrintSupport
 import facerec,os,helper
 import databasehelper as db
 import mysql.connector
 from mysql.connector import errorcode
 
 class Ui_General(object):
-    def mark(self):
-        facerec.recognize(True)
-        
+    def mark(self,MainWindow):
+        name,id = facerec.recognize(True)
+        comment = "Attendance Marked for {}. Is this You???".format(name)
+        buttonReply = QtWidgets.QMessageBox.question(MainWindow, 'Attendance Marked', comment, QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                         QtWidgets.QMessageBox.Yes)
+        if buttonReply == QtWidgets.QMessageBox.Yes:
+            cnx = db.connect()
+            cnx.database = 'RJIT'
+            db.mark_attendance(cnx,id)
+        else:
+            pass
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(351, 194)
+        MainWindow.setFixedSize(MainWindow.size())
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.markButton = QtWidgets.QPushButton(self.centralwidget)
@@ -29,7 +39,7 @@ class Ui_General(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.markButton.clicked.connect(self.mark)
+        self.markButton.clicked.connect(lambda: self.mark(MainWindow))
         self.cancelButton.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -56,6 +66,7 @@ class Ui_Privileged(object):
     
     def test(self):
         facerec.recognize()
+        
 
     def train(self):
         facerec.train()
@@ -70,6 +81,7 @@ class Ui_Privileged(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(397, 284)
+        MainWindow.setFixedSize(MainWindow.size())
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.addButton = QtWidgets.QPushButton(self.centralwidget)
@@ -130,6 +142,7 @@ class Ui_Login(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(337, 157)
+        Dialog.setFixedSize(Dialog.size())
         self.loginButton = QtWidgets.QPushButton(Dialog)
         self.loginButton.setGeometry(QtCore.QRect(130, 100, 75, 23))
         self.loginButton.setObjectName("loginButton")
@@ -171,18 +184,20 @@ class Ui_Login(object):
         self.label.setText(_translate("Dialog", "Select Mode:"))
 
 class Ui_PrePrev(object):
-    def OK(self):
+    def OK(self,MainWindow):
         if self.passField.text() == 'mytechworld':
             self.privilegedWindow = QtWidgets.QMainWindow()
             self.ui = Ui_Privileged()
             self.ui.setupUi(self.privilegedWindow)
             self.privilegedWindow.show()
+            MainWindow.close()
         else:
             pass
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(331, 144)
+        MainWindow.setFixedSize(MainWindow.size())
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -207,7 +222,7 @@ class Ui_PrePrev(object):
         self.retranslateUi(MainWindow)
         
         ### Ok Button ###
-        self.okBtn.clicked.connect(self.OK)
+        self.okBtn.clicked.connect(lambda: self.OK(MainWindow))
         self.cancelBtn.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -221,7 +236,7 @@ class Ui_PrePrev(object):
 
 
 class Ui_AddTeacher(object):
-    def add(self):
+    def add(self, MainWindow):
         id = self.label_7.text()
         fname = self.firstName.text()
         lname = self.lastName.text()
@@ -232,10 +247,15 @@ class Ui_AddTeacher(object):
             gender = 'F'
         elif self.mGender.isChecked():
             gender = 'M'
-        db.add_teacher(id,title,fname,lname,gender,design)
-        helper.ensure_dir('Training/'+id+'/')
-
-
+        result,comment = db.add_teacher(id,title,fname,lname,gender,design)
+        if result:
+            helper.ensure_dir('Training/'+id+'/')
+            MainWindow.close()
+            buttonReply = QtWidgets.QMessageBox.question(MainWindow, 'Teacher Added', comment, QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.Ok)
+            
+        
+            
+    
     def reset(self):
         self.firstName.clear()
         self.lastName.clear()
@@ -246,6 +266,7 @@ class Ui_AddTeacher(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(474, 229)
+        MainWindow.setFixedSize(MainWindow.size())
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -306,9 +327,8 @@ class Ui_AddTeacher(object):
         self.label_7.setGeometry(QtCore.QRect(90, 20, 80, 16))
         self.label_7.setObjectName("label_7")
         MainWindow.setCentralWidget(self.centralwidget)
-
         self.retranslateUi(MainWindow)
-        self.addBtn.clicked.connect(self.add)
+        self.addBtn.clicked.connect(lambda: self.add(MainWindow))
         self.resetBtn.clicked.connect(self.reset)
         self.cancelBtn.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -370,6 +390,7 @@ class Ui_clickpic(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(400, 216)
+        MainWindow.setFixedSize(MainWindow.size())
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -507,9 +528,43 @@ class Ui_QueryWindow(object):
         self.dateEnBox.setChecked(False)
         self.numRecords.hide()
 
+    def handlePrint(self):
+        dialog = QtPrintSupport.QPrintDialog()
+        if dialog.exec_() == QtPrintSupport.QPrintDialog.Accepted:
+            self.handlePaintRequest(dialog.printer())
+    
+    def handlePaintRequest(self, printer):
+        document = self.makeTableDocument()
+        document.print_(printer)
+
+    def makeTableDocument(self):
+        document = QtGui.QTextDocument()
+        cursor = QtGui.QTextCursor(document)
+        rows = self.myTable.rowCount()
+        columns = self.myTable.columnCount()
+        table = cursor.insertTable(rows + 1, columns)
+        format = table.format()
+        format.setHeaderRowCount(1)
+        table.setFormat(format)
+        format = cursor.blockCharFormat()
+        format.setFontWeight(QtGui.QFont.Bold)
+        for column in range(columns):
+            cursor.setCharFormat(format)
+            cursor.insertText(self.myTable.horizontalHeaderItem(column).text())
+            cursor.movePosition(QtGui.QTextCursor.NextCell)
+        
+        for row in range(rows):
+            for column in range(columns):
+                cursor.insertText(
+                    self.myTable.item(row, column).text())
+                cursor.movePosition(QtGui.QTextCursor.NextCell)
+        
+        return document
+        
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1064, 647)
+        MainWindow.resize(959, 647)
+        MainWindow.setFixedSize(MainWindow.size())
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -575,14 +630,14 @@ class Ui_QueryWindow(object):
         self.label_7.setGeometry(QtCore.QRect(30, 120, 47, 41))
         self.label_7.setObjectName("label_7")
         self.cancelBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.cancelBtn.setGeometry(QtCore.QRect(970, 600, 75, 23))
+        self.cancelBtn.setGeometry(QtCore.QRect(870, 600, 75, 23))
         self.cancelBtn.setObjectName("cancelBtn")
         self.searchBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.searchBtn.setGeometry(QtCore.QRect(790, 600, 75, 23))
+        self.searchBtn.setGeometry(QtCore.QRect(690, 600, 75, 23))
         self.searchBtn.setObjectName("searchBtn")
         self.printBtn = QtWidgets.QPushButton(self.centralwidget)
         self.printBtn.setEnabled(False)
-        self.printBtn.setGeometry(QtCore.QRect(880, 600, 75, 23))
+        self.printBtn.setGeometry(QtCore.QRect(780, 600, 75, 23))
         self.printBtn.setObjectName("printBtn")
         self.betweenBox = QtWidgets.QCheckBox(self.centralwidget)
         self.betweenBox.setEnabled(False)
@@ -593,9 +648,9 @@ class Ui_QueryWindow(object):
         self.dateEnBox.setText("")
         self.dateEnBox.setObjectName("dateEnBox")
         self.myTable = QtWidgets.QTableWidget(self.centralwidget)
-        self.myTable.setGeometry(QtCore.QRect(20, 170, 1021, 401))
+        self.myTable.setGeometry(QtCore.QRect(20, 170, 921, 401))
         self.myTable.setObjectName("myTable")
-        self.myTable.setColumnCount(10)
+        self.myTable.setColumnCount(9)
         self.myTable.setRowCount(0)
         item = QtWidgets.QTableWidgetItem()
         self.myTable.setHorizontalHeaderItem(0, item)
@@ -615,17 +670,15 @@ class Ui_QueryWindow(object):
         self.myTable.setHorizontalHeaderItem(7, item)
         item = QtWidgets.QTableWidgetItem()
         self.myTable.setHorizontalHeaderItem(8, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.myTable.setHorizontalHeaderItem(9, item)
         self.resetBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.resetBtn.setGeometry(QtCore.QRect(700, 600, 75, 23))
+        self.resetBtn.setGeometry(QtCore.QRect(600, 600, 75, 23))
         self.resetBtn.setObjectName("resetBtn")
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
-        self.label_8.setGeometry(QtCore.QRect(550, 600, 121, 16))
+        self.label_8.setGeometry(QtCore.QRect(450, 600, 121, 16))
         self.label_8.setText("")
         self.label_8.setObjectName("label_8")
         self.numRecords = QtWidgets.QLabel(self.centralwidget)
-        self.numRecords.setGeometry(QtCore.QRect(570, 600, 101, 16))
+        self.numRecords.setGeometry(QtCore.QRect(470, 600, 101, 16))
         self.numRecords.setObjectName("numRecords")
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -634,6 +687,7 @@ class Ui_QueryWindow(object):
         self.betweenBox.toggled.connect(self.betweenToggle)
         self.searchBtn.clicked.connect(self.query)
         self.resetBtn.clicked.connect(self.reset)
+        self.printBtn.clicked.connect(self.handlePrint)
         self.cancelBtn.clicked.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 

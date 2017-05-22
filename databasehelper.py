@@ -96,6 +96,7 @@ def create_table(cnx):
 def add_teacher(teacher_id,title,first_name,last_name,gender,designation,db='RJIT'):
     cnx = connect()
     cnx.database = db
+    added = False
     cursor = cnx.cursor()
     add_teacher = ("INSERT INTO `teachers` "
                    "(teacher_id, title, first_name, last_name, gender ,designation)"
@@ -104,11 +105,13 @@ def add_teacher(teacher_id,title,first_name,last_name,gender,designation,db='RJI
     try:
         cursor.execute(add_teacher, data_teacher)
         cnx.commit()
-        print "Teacher '{}' added to the table 'teachers'".format(first_name+" "+last_name)
+        comment = "Teacher '{}' added to Database".format(first_name+" "+last_name)
+        added = True
     except mysql.connector.Error as err:
-        print err.msg
+        comment = err.msg
     cursor.close()
     cnx.close()
+    return added,comment
     
 
 def mark_attendance(cnx,tid):
@@ -119,10 +122,10 @@ def mark_attendance(cnx,tid):
     cursor = cnx.cursor()
     name = None
     try:
-        cursor.execute("SELECT `first_name`, `last_name` FROM `teachers` \
+        cursor.execute("SELECT `title`, `first_name`, `last_name` FROM `teachers` \
                        WHERE `teacher_id` = '{}'".format(teacher_id))
         s = cursor.fetchall()
-        name = s[0][0] +' '+s[0][1]
+        name = s[0][0] +' '+s[0][1]+' '+s[0][2]
     except mysql.connector.Error as err:
         print err.msg
             
@@ -134,17 +137,14 @@ def mark_attendance(cnx,tid):
             present = False
     except mysql.connector.Error as err:
         print err.msg
-    print present
     if not present:
         mark_attendance = ("INSERT INTO `attendance` "
                        "(`teacher_id`, `current_date`, `login_time`) \
                        VALUES ('{}', CURRENT_DATE(), CURRENT_TIME())".format(teacher_id))
-        print 'Hello'
     else:
         mark_attendance = ("UPDATE `attendance` SET `logout_time` = CURRENT_TIME() \
                            WHERE `attendance`.`teacher_id` = '{}' AND \
                            `attendance`.`current_date` = CURRENT_DATE()".format(teacher_id))
-        print 'HIiii'
     try:
         cursor.execute(mark_attendance)
         cnx.commit()
@@ -177,3 +177,20 @@ def query(teacher_id,title,fName,lName,design,gender,sDate,eDate):
     cnx.close()
     return result
 
+def markUtil(id):
+    name = None
+    if id < 10:
+        tid = '0'+str(id)
+    teacher_id = 'RJITCSEIT'+tid
+    cnx = connect()
+    cnx.database = 'RJIT'
+    cursor = cnx.cursor()
+    try:
+        cursor.execute("SELECT `first_name`, `last_name` FROM `teachers` \
+                    WHERE `teacher_id` = '{}'".format(teacher_id))
+        s = cursor.fetchall()
+        name = s[0][0] +' '+s[0][1]
+    except mysql.connector.Error as err:
+        print err.msg
+    cnx.close()
+    return name
