@@ -164,12 +164,12 @@ def query(teacher_id,title,fName,lName,design,gender,sDate,eDate):
             cursor.execute("SELECT t.teacher_id, t.title, t.first_name, t.last_name, t.gender, t.designation, a.current_date, \
             a.login_time, a.logout_time from teachers t, attendance a where a.teacher_id = t.teacher_id and t.teacher_id LIKE '{}' \
             and t.title LIKE '{}' and t.first_name LIKE '{}' and t.last_name LIKE '{}' and t.gender LIKE '{}' and t.designation LIKE \
-            '{}' and a.current_date LIKE '{}'".format(teacher_id,title,fName,lName,gender,design,sDate))
+            '{}' and a.current_date LIKE '{}' ORDER BY a.current_date".format(teacher_id,title,fName,lName,gender,design,sDate))
         else:
             cursor.execute("SELECT t.teacher_id, t.title, t.first_name, t.last_name, t.gender, t.designation, a.current_date, \
             a.login_time, a.logout_time from teachers t, attendance a where a.teacher_id = t.teacher_id and t.teacher_id LIKE '{}' \
             and t.title LIKE '{}' and t.first_name LIKE '{}' and t.last_name LIKE '{}' and t.gender LIKE '{}' and t.designation LIKE \
-            '{}' and a.current_date BETWEEN '{}' and '{}'".format(teacher_id,title,fName,lName,gender,design,sDate,eDate))
+            '{}' and a.current_date BETWEEN '{}' and '{}' ORDER BY a.current_date".format(teacher_id,title,fName,lName,gender,design,sDate,eDate))
         result = cursor.fetchall()
     except mysql.connector.Error as err:
         print err.msg

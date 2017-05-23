@@ -560,6 +560,9 @@ class Ui_QueryWindow(object):
                 cursor.movePosition(QtGui.QTextCursor.NextCell)
         
         return document
+    
+    def edatevalidator(self):
+        self.endDate.setMinimumDate(self.startDate.date())
         
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -683,6 +686,7 @@ class Ui_QueryWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
+        self.startDate.dateChanged.connect(self.edatevalidator)
         self.dateEnBox.toggled.connect(self.dateToggle)
         self.betweenBox.toggled.connect(self.betweenToggle)
         self.searchBtn.clicked.connect(self.query)

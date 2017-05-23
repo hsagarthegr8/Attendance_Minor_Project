@@ -6,7 +6,7 @@ import databasehelper as db
 def facedetect():
     face_cascade = cv2.CascadeClassifier('Cascade/haarcascade_frontalface_default.xml')
     eye_cascade = cv2.CascadeClassifier('Cascade/haarcascade_eye.xml')
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(1)
     
     while True:
         ret,img = cam.read()
@@ -27,7 +27,7 @@ def facedetect():
 def create_dataset(teacher_id):
     faceDetect = cv2.CascadeClassifier('Cascade/haarcascade_frontalface_default.xml')
     eye_cascade = cv2.CascadeClassifier('Cascade/haarcascade_eye.xml')
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(1)
     sample_count = 0
     helper.ensure_dir('Training/')
     directory = 'Training/' + teacher_id + '/'
@@ -68,13 +68,13 @@ def train():
 def recognize(mark = False):
     faceDetect = cv2.CascadeClassifier('Cascade/haarcascade_frontalface_default.xml')
     eye_cascade = cv2.CascadeClassifier('Cascade/haarcascade_eye.xml')
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(1)
     recognizer = cv2.createLBPHFaceRecognizer(2,2,7,7,15)
     recognizer.load('Recognizer/trainingData.yaml')
     id = 0
     font = cv2.cv.InitFont(cv2.cv.CV_FONT_HERSHEY_COMPLEX_SMALL,1,1,0,1)
     marked = False
-    
+    name = None
     while True:
         ret,img = cam.read()
         gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
@@ -86,7 +86,8 @@ def recognize(mark = False):
                 cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
                 id,conf = recognizer.predict(gray[y:y+h,x:x+w])
                 cv2.cv.PutText(cv2.cv.fromarray(img),str(id),(x,y+h),font,255)
-                if mark:
+                print conf
+                if mark and id != -1:
                     name = db.markUtil(id)
                     marked = True
         cv2.imshow('My Face',img)
